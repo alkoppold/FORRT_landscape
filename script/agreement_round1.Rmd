@@ -1,0 +1,71 @@
+---
+title: "agreement_round1"
+author: "Alina Koppold"
+date: "2023-05-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = F,
+                      message = F)
+library(readr)
+library(tidyverse)
+library(crosstable)
+library(irr)
+```
+
+
+```{r data-impport}
+odd <- read_csv("data/Round 1 Screening - Sheet1 (screener_id ODD).csv") %>% drop_na(unique_id) %>% select(1,7, 8,9)
+even <- read_csv("data/Round 1 Screening - Sheet2 (screener_id EVEN).csv")%>% drop_na(unique_id) %>% select(1,7, 8,9)
+```
+
+```{r data-wrangle}
+df.all = merge(odd, even, by = "unique_id")
+names(df.all) = c("unique_id", "require_full_text_odd", "screening_odd", "screener_odd", 
+                  "require_full_text_even", "screening_even", "screener_even")
+
+# check and remove typos
+test = df.all %>% filter(require_full_text_odd =="o")
+df.all$require_full_text_odd[df.all$require_full_text_odd == "o"] <- 0
+```
+
+## Agreement on screening between even and odd
+### crosstable 1 shows typos in sheet
+
+```{r c1}
+crosstable(df.all, screening_odd, by=screening_even, total="both") %>%
+  as_flextable(keep_id=FALSE)
+```
+
+### crosstable 2 correct one
+```{r c1-corr}
+# fixing typos 
+# for odd
+df.all$screening_odd[df.all$screening_odd == "exlcude"] <- "exclude"
+df.all$screening_odd[df.all$screening_odd == "incldue"] <- "include"
+df.all$screening_odd[df.all$screening_odd == "unsure"] <- "uncertain"
+# for even
+df.all$screening_even[df.all$screening_even == "exlcude"] <- "exclude"
+
+
+# check again
+crosstable(df.all, screening_odd, by=screening_even, total="both") %>%
+  as_flextable(keep_id=FALSE)
+```
+
+
+## Moderate agreement (Cohen's Kappa) between rater *odd* and rater *even* with respect to the screening decision (exclude, include, uncertain) was observed for round one: 
+```{r kappa}
+kappa2(df.all[,c(3,6)], "unweighted")
+```
+
+
+## Even/ odd crosstable comparison about full text required
+```{r c2}
+crosstable(df.all, require_full_text_odd, by=require_full_text_even, total="both") %>%
+  as_flextable(keep_id=FALSE)
+```
+
+*end
