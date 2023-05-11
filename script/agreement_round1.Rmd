@@ -68,4 +68,5 @@ crosstable(df.all, require_full_text_odd, by=require_full_text_even, total="both
   as_flextable(keep_id=FALSE)
 ```
 
+## alternative: S-index 
 *end
