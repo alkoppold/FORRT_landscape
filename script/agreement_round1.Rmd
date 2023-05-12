@@ -68,5 +68,24 @@ crosstable(df.all, require_full_text_odd, by=require_full_text_even, total="both
   as_flextable(keep_id=FALSE)
 ```
 
+
 ## alternative: S-index 
+```{r s-index}
+source("https://raw.githubusercontent.com/rnorouzian/m/master/r.r")
+irr(df.all[,c(3,6)])
+```
+
+# testing the lack of kappa 
+```{r}
+
+v1 = c("ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELS","ELS", "ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELS","ELS")
+v2 = c("ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF", "ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF","ELF")
+test = as.data.frame(cbind(v1,v2))
+test$v1 = as.factor(test$v1)
+test$v2 = as.factor(test$v2)
+irr::kappa2(test, "unweighted")
+irr(test)
+```
+
+
 *end
